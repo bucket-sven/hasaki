@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+//import java.util.concurrent.TimeUnit
 import javax.validation.constraints.NotBlank
 
 data class Auth(val regType: String? = null,
@@ -63,6 +64,7 @@ class AuthService {
             it.setEx((TOKEN_PREFIX + token).toByteArray(), 60, user.id.toString().toByteArray())
             it.exec()
         }
+//        liveRedis.opsForValue().set("test", "value", 1, TimeUnit.MINUTES)
         return user
     }
 }
