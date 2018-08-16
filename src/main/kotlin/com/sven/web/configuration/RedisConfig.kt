@@ -7,30 +7,35 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 
-open class BaseRedisConfig {
+@Configuration
+class BaseRedisConfig {
     var host: String = "localhost"
     var port: Int = 6379
     var database: Int = 0
 }
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.redis.main")
-class MainRedisConfig : BaseRedisConfig()
-
-@Configuration
-@ConfigurationProperties(prefix = "spring.redis.live")
-class LiveRedisConfig : BaseRedisConfig()
-
-@Configuration
 class RedisConfig {
     @Bean
-    fun mainRedis(redisConfig: MainRedisConfig): StringRedisTemplate {
-        return createRedisClient(redisConfig)
+    @ConfigurationProperties("spring.redis.main")
+    fun mainRedisConfig(): BaseRedisConfig {
+        return BaseRedisConfig()
     }
 
     @Bean
-    fun liveRedis(redisConfig: LiveRedisConfig): StringRedisTemplate {
-        return createRedisClient(redisConfig)
+    @ConfigurationProperties("spring.redis.live")
+    fun liveRedisConfig(): BaseRedisConfig {
+        return BaseRedisConfig()
+    }
+
+    @Bean
+    fun mainRedis(): StringRedisTemplate {
+        return createRedisClient(mainRedisConfig())
+    }
+
+    @Bean
+    fun liveRedis(): StringRedisTemplate {
+        return createRedisClient(liveRedisConfig())
     }
 
     private fun createRedisClient(redisConfig: BaseRedisConfig): StringRedisTemplate {
