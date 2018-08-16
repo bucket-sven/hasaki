@@ -8,7 +8,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 
 open class BaseRedisConfig {
-    var host: String = ""
+    var host: String = "localhost"
     var port: Int = 6379
     var database: Int = 0
 }
@@ -37,6 +37,9 @@ class RedisConfig {
         val redisTemplate = StringRedisTemplate()
         val conf = RedisStandaloneConfiguration()
         val jedis = JedisConnectionFactory(conf)
+        jedis.poolConfig?.minIdle = 2
+//        jedis.poolConfig?.maxTotal = 10
+//        jedis.poolConfig?.maxIdle = 8
         conf.hostName = redisConfig.host
         conf.port = redisConfig.port
         conf.database = redisConfig.database
