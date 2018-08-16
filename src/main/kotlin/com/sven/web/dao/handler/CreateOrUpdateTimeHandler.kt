@@ -18,10 +18,7 @@ class CreateOrUpdateTimeHandler : MetaObjectHandler() {
     }
 
     override fun updateFill(metaObject: MetaObject?) {
-        val updateTime = getFieldValByName("updateTime", metaObject)
         val now = Timestamp(System.currentTimeMillis())
-        if (updateTime == null) {
-            setFieldValByName("updateTime", now, metaObject)
-        }
+        setFieldValByName("updateTime", now, metaObject)
     }
 }
