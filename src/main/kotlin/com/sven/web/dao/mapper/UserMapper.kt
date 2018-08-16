@@ -7,6 +7,4 @@ import com.sven.web.dao.entity.User
 import org.springframework.stereotype.Component
 
 @Component
-interface UserMapper : BaseMapper<User> {
-    fun <T>selectPage(page: Page<T>, wrapper: EntityWrapper<T>)
-}
+interface UserMapper : BaseMapper<User>
