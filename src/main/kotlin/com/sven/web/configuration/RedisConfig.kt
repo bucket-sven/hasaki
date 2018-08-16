@@ -7,7 +7,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 
-@Configuration
 class BaseRedisConfig : RedisStandaloneConfiguration()
 
 @Configuration
