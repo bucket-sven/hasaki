@@ -11,13 +11,17 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-//import java.util.concurrent.TimeUnit
-import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotEmpty
 
-data class Auth(val regType: String? = null,
-                @NotBlank
-                @Length(min = 2, max = 10)
-                val account: String? = null)
+//import java.util.concurrent.TimeUnit
+
+// 注解不能出现在构造函数的参数上, 否则validator不生效
+class Auth(regType: String?, account: String?) {
+    var regType: String? = regType
+    @Length(min = 2, max = 10)
+    @NotEmpty
+    var account: String? = account
+}
 
 @Service
 class AuthService {
@@ -41,7 +45,7 @@ class AuthService {
 
     @Transactional
     fun auth(data: Auth): User? {
-        val users = userDAO.selectByMap(hashMapOf<String, Any>("account" to data.account!!, "reg_type" to data.regType!!))
+        val users = userDAO.selectByMap(hashMapOf<String, Any?>("account" to data.account, "reg_type" to data.regType))
         val user: User
         if (users.size == 0) {
             user = User(account = data.account, regType = data.regType)

@@ -2,6 +2,8 @@ package com.sven.web.configuration.multicontenttype
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONObject
+import com.sven.web.util.validator.ValidationUtil
+import com.sven.web.util.error.ParamsError
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.web.bind.support.WebDataBinderFactory
@@ -31,7 +33,13 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
             map[t] = u[0]
         }
         val str = JSON.toJSONString(map)
-        return JSON.parseObject(str, type)
+        val ret = JSON.parseObject<Any>(str, type)
+        val valid = ValidationUtil.validateEntity(ret)
+        if (valid.hasErrors) {
+            val errors = valid.errorMsg?.map { it.key + it.value }?.joinToString(",")
+            throw ParamsError("params_error", errors!!)
+        }
+        return ret
     }
 
     private fun queryMap(webRequest: NativeWebRequest): Map<String, Array<out String>> {

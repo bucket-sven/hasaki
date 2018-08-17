@@ -1,3 +1,3 @@
 package com.sven.web.util.error
 
-class CustomError(message: String, var statusCode: Int) : Exception(message)
+open class CustomError(val code: String, message: String, val statusCode: Int) : Exception(message)
