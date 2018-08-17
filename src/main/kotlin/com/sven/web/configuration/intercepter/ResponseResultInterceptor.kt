@@ -76,6 +76,7 @@ class ResponseResultInterceptor {
         val writer = response.writer
         response.status = status
         response.setHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
+        println(JSON.toJSONString(data))
         writer.write(JSON.toJSONString(data))
         writer.flush()
         writer.close()

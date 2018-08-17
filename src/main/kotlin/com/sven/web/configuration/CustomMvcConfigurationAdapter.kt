@@ -3,6 +3,7 @@ package com.sven.web.configuration
 import com.baomidou.mybatisplus.plugins.PerformanceInterceptor
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sven.web.configuration.multicontenttype.CustomRequestParamsArgumentResolver
+import com.sven.web.util.Constants
 import org.springframework.context.annotation.Bean
 //import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,7 +32,7 @@ class CustomMvcConfigurationAdapter : WebMvcConfigurer {
     @Bean
     fun getObjectMapper(): ObjectMapper {
         val obj = ObjectMapper()
-        obj.dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ")
+        obj.dateFormat = SimpleDateFormat(Constants.DATE_FORMAT)
         return obj
     }
 
