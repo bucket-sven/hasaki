@@ -7,10 +7,10 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 
-class BaseRedisConfig : RedisStandaloneConfiguration()
-
 @Configuration
 class RedisConfig {
+    inner class BaseRedisConfig : RedisStandaloneConfiguration()
+
     @Bean
     @ConfigurationProperties("spring.redis.main")
     fun mainRedisConfig(): BaseRedisConfig {

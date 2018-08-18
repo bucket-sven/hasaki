@@ -1,12 +1,14 @@
 package com.sven.web.configuration.advice
 
-import com.sven.web.configuration.entity.ResponseData
-import com.sven.web.util.error.CustomError
+import com.sven.web.common.error.framework.BaseFrameworkError
+import com.sven.web.configuration.entity.ApiErrorResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.NoHandlerFoundException
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -18,21 +20,34 @@ import javax.servlet.http.HttpServletResponse
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    @ExceptionHandler(value = [ CustomError::class, Exception::class ])
+    @ExceptionHandler(value = [ BaseFrameworkError::class ])
     @ResponseBody
-    fun defaultErrorHandler(req: HttpServletRequest, res: HttpServletResponse, e: Exception): ResponseData {
-        val responseData = ResponseData(timestamp = Date(), message = e.message)
-        val status: Int
-        if (e is CustomError) {
-            logger.warn("{}: {}", e.javaClass.simpleName, e.message)
-            responseData.error = HttpStatus.BAD_REQUEST.reasonPhrase
-            status = e.statusCode
-        } else {
-            logger.error("", e)
-            responseData.error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
-            status = HttpStatus.INTERNAL_SERVER_ERROR.value()
-        }
-        res.status = status
+    fun defaultErrorHandler(req: HttpServletRequest, res: HttpServletResponse, e: BaseFrameworkError): ApiErrorResponse {
+        val responseData = ApiErrorResponse(timestamp = Date(), message = e.message)
+        logger.warn("{}: {}", e.javaClass.name, e.message)
+        responseData.error = e.code
+        res.status = e.statusCode
+        responseData.status = "ERROR"
+        return responseData
+    }
+
+    @ExceptionHandler(value = [ NoHandlerFoundException::class ])
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun notFound(): ApiErrorResponse {
+        val status = HttpStatus.NOT_FOUND
+        val responseData = ApiErrorResponse(timestamp = Date(), error= status.name, message = status.reasonPhrase)
+        responseData.status = "ERROR"
+        return responseData
+    }
+
+    @ExceptionHandler(value = [ Exception::class ])
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun internalServerError(e: Exception): ApiErrorResponse {
+        logger.error("", e)
+        val status = HttpStatus.INTERNAL_SERVER_ERROR
+        val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData
     }

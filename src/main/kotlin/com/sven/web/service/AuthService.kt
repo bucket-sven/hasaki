@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import javax.validation.constraints.NotEmpty
-
 //import java.util.concurrent.TimeUnit
 
 // 注解不能出现在构造函数的参数上, 否则validator不生效

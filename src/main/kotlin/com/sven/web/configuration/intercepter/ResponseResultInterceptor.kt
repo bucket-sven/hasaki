@@ -1,8 +1,9 @@
 package com.sven.web.configuration.intercepter
 
 import com.alibaba.fastjson.JSON
-import com.sven.web.configuration.entity.ResponseData
-import com.sven.web.util.error.CustomError
+import com.sven.web.common.error.service.BaseServiceError
+import com.sven.web.configuration.entity.ApiErrorResponse
+import com.sven.web.util.logger.HttpLogger
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * interceptor中的异常无法被GlobalExceptionHandler捕获，因此需要在这里处理，包括请求日志打印
+ */
 @Component
 @Aspect
 @Order(1)
@@ -24,13 +27,13 @@ class ResponseResultInterceptor {
     private val logger = LoggerFactory.getLogger(ResponseResultInterceptor::class.java)
 
     @Around("execution (* com.sven.web.controller.**.*(..))")
-    fun responseResult(joinPoint: ProceedingJoinPoint): ResponseData? {
+    fun responseResult(joinPoint: ProceedingJoinPoint): ApiErrorResponse? {
         val requestAttributes = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
         val request = requestAttributes.request
         val response = requestAttributes.response!!
-        logRequestIncoming(request)
-        val startTime = System.currentTimeMillis()
-        val responseData = ResponseData(timestamp = Date())
+        // 只会打印正常请求的log, 404等错误无法打印
+        HttpLogger.logRequestIncoming(request)
+        val responseData = ApiErrorResponse(timestamp = Date())
         try {
             val result = joinPoint.proceed(joinPoint.args)
             responseData.status = "OK"
@@ -38,45 +41,31 @@ class ResponseResultInterceptor {
             return responseData
         } catch (e: Exception) {
             var status = HttpStatus.INTERNAL_SERVER_ERROR.value()
-            if (e is CustomError) {
-                logger.warn("{}: {}", e.javaClass.simpleName, e.message)
+            if (e is BaseServiceError) {
+                logger.warn("{}: {}", e.javaClass.name, e.message)
                 status = e.statusCode
                 responseData.error = e.code
             } else {
-                responseData.error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
+                responseData.error = HttpStatus.INTERNAL_SERVER_ERROR.name
                 logger.error("", e)
             }
             responseData.status = "ERROR"
             responseData.message = e.message
-            writeResponse(response, responseData, status)
+            writeResponseError(response, responseData, status)
+        } finally {
+            HttpLogger.logResponseOuting(request, response)
         }
         // return null的时候，就不会再调用后面的interceptor并且不会再response.write了
-        val ms = System.currentTimeMillis() - startTime
-        logResponseOuting(request, response, ms)
         return null
     }
 
-    private fun logRequestIncoming(request: HttpServletRequest) {
-        var path = request.servletPath
-        if (!request.queryString.isNullOrEmpty()) {
-            path += request.queryString
-        }
-        logger.info("{} {}", request.method, path)
-    }
-
-    private fun logResponseOuting(request: HttpServletRequest, response: HttpServletResponse, ms: Long) {
-        var path = request.servletPath
-        if (!request.queryString.isNullOrEmpty()) {
-            path += request.queryString
-        }
-        logger.info("{} {} {} {}ms", request.method, path, response.status, ms)
-    }
-
-    private fun writeResponse(response: HttpServletResponse, data: Any, status: Int = HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+    /**
+     * 请求异常无法被GlobalExceptionHandler捕获，因此在这里直接向response写入错误数据
+     */
+    private fun writeResponseError(response: HttpServletResponse, data: Any, status: Int = HttpStatus.INTERNAL_SERVER_ERROR.value()) {
         val writer = response.writer
         response.status = status
         response.setHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
-        println(JSON.toJSONString(data))
         writer.write(JSON.toJSONString(data))
         writer.flush()
         writer.close()

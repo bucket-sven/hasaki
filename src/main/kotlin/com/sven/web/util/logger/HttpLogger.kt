@@ -1,0 +1,35 @@
+package com.sven.web.util.logger
+
+import org.slf4j.LoggerFactory
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
+object HttpLogger {
+    private val logger = LoggerFactory.getLogger(HttpLogger::class.java)
+    private const val requestStartTimeKey = "REQUEST_LOG_START_TIME"
+    fun logRequestIncoming(request: HttpServletRequest) {
+        val now = System.currentTimeMillis()
+        request.setAttribute(requestStartTimeKey, now)
+        val path = getFullQueryPath(request)
+
+        logger.info("{} {}", request.method, path)
+    }
+
+    fun logResponseOuting(request: HttpServletRequest, response: HttpServletResponse) {
+        val path = getFullQueryPath(request)
+        val startTime = request.getAttribute(requestStartTimeKey) as Long?
+        var ms: Long? = null
+        if (startTime != null) {
+            ms = System.currentTimeMillis() - startTime
+        }
+        logger.info("{} {} {} {}ms", request.method, path, response.status, ms)
+    }
+
+    private fun getFullQueryPath(request: HttpServletRequest): String {
+        var path = request.servletPath
+        if (!request.queryString.isNullOrEmpty()) {
+            path += "?${request.queryString}"
+        }
+        return path
+    }
+}

@@ -10,7 +10,6 @@ import com.sven.web.service.AuthService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 class AuthController {
@@ -21,16 +20,17 @@ class AuthController {
     private lateinit var userMapper: UserMapper
 
     @RequestMapping("/auth/sign", method = [ RequestMethod.POST ], consumes = [ MediaType.ALL_VALUE ])
-    fun sign(@CustomRequestParams @Valid params: Auth): Any? {
+    fun sign(@CustomRequestParams params: Auth): Any? {
         val auth = Auth(account = params.account, regType = params.regType)
         return authService.auth(auth)
     }
 
-    @RequestMapping("/auth/test")
-    fun sign(@CustomRequestParams map: HashMap<String, String>): Any {
+    @RequestMapping("/user/list")
+    fun users(@RequestParam(defaultValue = "0") page: Int,
+              @RequestParam(defaultValue = "10") count: Int): Any {
         val wrapper = EntityWrapper<User>(User())
-        val page = Page<User>(1, 10)
+        val pageObj = Page<User>(page, count)
         wrapper.where("account={0}", "test").orderBy("id DESC")
-        return userMapper.selectPage(page, wrapper)
+        return userMapper.selectPage(pageObj, wrapper)
     }
 }
