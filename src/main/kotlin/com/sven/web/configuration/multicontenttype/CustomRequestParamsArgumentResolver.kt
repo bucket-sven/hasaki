@@ -41,10 +41,13 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
         }
         val str = JSON.toJSONString(map)
         var ret = JSON.parseObject<Any>(str, type)
+        // 如果传入参数无法构造CustomRequestParams修饰的对象
         if (ret == null) {
-            val constructor = Class.forName(type.typeName).declaredConstructors[0]
+            // 获取参数最少的构造函数，构造一个默认对象进行参数验证
+            val constructors = Class.forName(type.typeName).declaredConstructors
+            constructors.sortBy { it.parameterCount }
+            val constructor = constructors[0]
             val args = arrayListOf<Any?>()
-            println(constructor)
             constructor.parameters.forEach {
                 args.add(null)
             }

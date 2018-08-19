@@ -1,6 +1,9 @@
 package com.sven.web.service
 
-open class BaseListParams(page: Int?, count: Int?) {
-    var page = page ?: 1
-    var count = count ?: 20
+//import javax.validation.constraints.NotNull
+
+open class BaseListParams(page: Int = 1, count: Int = 20) {
+//    @NotNull(message = "不能为空")
+    var page = page
+    var count = count
 }
