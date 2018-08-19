@@ -39,7 +39,7 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
         query.forEach { t, u ->
             map[t] = u[0]
         }
-        val str = JSON.toJSONString(map)
+        val str = map.toJSONString()
         var ret = JSON.parseObject<Any>(str, type)
         // 如果传入参数无法构造CustomRequestParams修饰的对象
         if (ret == null) {
