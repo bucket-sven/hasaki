@@ -4,6 +4,7 @@ import com.sven.web.common.error.framework.BaseFrameworkError
 import com.sven.web.configuration.entity.ApiErrorResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -47,6 +48,17 @@ class GlobalExceptionHandler {
     fun internalServerError(e: Exception): ApiErrorResponse {
         logger.error("", e)
         val status = HttpStatus.INTERNAL_SERVER_ERROR
+        val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
+        responseData.status = "ERROR"
+        return responseData
+    }
+
+    @ExceptionHandler(value = [ HttpMediaTypeNotSupportedException::class ])
+    @ResponseBody
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    fun unsupportedMediaType(e: Exception): ApiErrorResponse {
+        logger.error("", e)
+        val status = HttpStatus.UNSUPPORTED_MEDIA_TYPE
         val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData

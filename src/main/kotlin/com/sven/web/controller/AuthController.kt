@@ -21,7 +21,7 @@ class AuthController {
     @Autowired
     private lateinit var userMapper: UserMapper
 
-    @RequestMapping("/auth/sign", method = [ RequestMethod.POST ], consumes = [ MediaType.ALL_VALUE ])
+    @RequestMapping("/auth/sign", method = [ RequestMethod.POST ], consumes = [ MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     fun sign(@CustomRequestParams params: Auth): Any? {
         val auth = Auth(account = params.account, regType = params.regType)
         return authService.auth(auth)

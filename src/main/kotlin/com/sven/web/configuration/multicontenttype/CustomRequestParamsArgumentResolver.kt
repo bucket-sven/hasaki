@@ -29,8 +29,8 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
      */
     override fun resolveArgument(parameter: MethodParameter, mavContainer: ModelAndViewContainer?, webRequest: NativeWebRequest, binderFactory: WebDataBinderFactory?): Any {
         val type = parameter.genericParameterType
-        val json = getRequestBody(webRequest)
         val servletRequest = webRequest.getNativeRequest(HttpServletRequest::class.java)!!
+        val json = getRequestBody(webRequest, servletRequest)
         val query = servletRequest.parameterMap
         var map = JSONObject()
         if (json != null) {
@@ -61,11 +61,14 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
         return ret
     }
 
-    private fun getRequestBody(webRequest: NativeWebRequest): String? {
-        val servletRequest = webRequest.getNativeRequest(HttpServletRequest::class.java)!!
-        var jsonBody = webRequest.getAttribute(attrName, NativeWebRequest.SCOPE_REQUEST) as String?
+    private fun shouldParseJSON(webRequest: HttpServletRequest): Boolean {
         val contentTypes = arrayOf(MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-        if (!contentTypes.contains(servletRequest.contentType)) {
+        return contentTypes.contains(webRequest.contentType)
+    }
+
+    private fun getRequestBody(webRequest: NativeWebRequest, servletRequest: HttpServletRequest): String? {
+        var jsonBody = webRequest.getAttribute(attrName, NativeWebRequest.SCOPE_REQUEST) as String?
+        if (!shouldParseJSON(servletRequest)) {
             return null
         }
         if (jsonBody == null) {
