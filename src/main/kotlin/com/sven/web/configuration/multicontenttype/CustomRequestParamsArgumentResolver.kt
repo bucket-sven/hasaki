@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletRequest
 
 /**
  * 此类与GlobalExceptionHandler有诸多联系，比如异常拋出后，由GlobalExceptionHandler处理, 请求日志打印也需要与之对应
- * !!!!!!! 注意: 对GET请求无效 !!!!!!!
  */
+//@EnableWebMvc
 class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
     private val attrName = "JSON_REQUEST_BODY"
     override fun supportsParameter(parameter: MethodParameter): Boolean {
@@ -40,7 +40,16 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
             map[t] = u[0]
         }
         val str = JSON.toJSONString(map)
-        val ret = JSON.parseObject<Any>(str, type)
+        var ret = JSON.parseObject<Any>(str, type)
+        if (ret == null) {
+            val constructor = Class.forName(type.typeName).declaredConstructors[0]
+            val args = arrayListOf<Any?>()
+            println(constructor)
+            constructor.parameters.forEach {
+                args.add(null)
+            }
+            ret = constructor.newInstance(*args.toArray())
+        }
         val valid = ValidationUtil.validateEntity(ret)
         if (valid.hasErrors) {
             val errors = valid.errorMsg?.map { it.key + it.value }?.joinToString(",")
