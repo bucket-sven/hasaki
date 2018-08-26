@@ -57,7 +57,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     fun unsupportedMediaType(e: Exception): ApiErrorResponse {
-        logger.error("", e)
+        logger.warn(e.message)
         val status = HttpStatus.UNSUPPORTED_MEDIA_TYPE
         val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
