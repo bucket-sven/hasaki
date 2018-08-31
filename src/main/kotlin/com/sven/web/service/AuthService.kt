@@ -24,9 +24,9 @@ class Auth(var regType: String?, account: String?) {
 @Service
 class AuthService {
     @Autowired
-    private lateinit var userDAO: UserMapper
+    private lateinit var userMapper: UserMapper
     @Autowired
-    private lateinit var userTokenDAO: UserTokenMapper
+    private lateinit var userTokenMapper: UserTokenMapper
 
     @Autowired
     @Qualifier("mainRedis")
@@ -43,22 +43,22 @@ class AuthService {
 
     @Transactional
     fun auth(data: Auth): User? {
-        val users = userDAO.selectByMap(hashMapOf<String, Any?>("account" to data.account, "reg_type" to data.regType))
+        val users = userMapper.selectByMap(hashMapOf<String, Any?>("account" to data.account, "reg_type" to data.regType))
         val user: User
         if (users.size == 0) {
             user = User(account = data.account, regType = data.regType)
-            userDAO.insert(user)
+            userMapper.insert(user)
         } else {
             user = users[0]
         }
         val token = RandomUtil.randomString(32)
-        var userToken = userTokenDAO.selectOne(UserToken(userId= user.id))
+        var userToken = userTokenMapper.selectOne(UserToken(userId= user.id))
         if (userToken == null) {
             userToken = UserToken(token = token, userId = user.id)
-            userTokenDAO.insert(userToken)
+            userTokenMapper.insert(userToken)
         } else {
             userToken.token = token
-            userTokenDAO.updateById(userToken)
+            userTokenMapper.updateById(userToken)
         }
         mainRedis.execute {
             it.multi()
