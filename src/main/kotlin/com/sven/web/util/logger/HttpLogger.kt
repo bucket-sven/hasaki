@@ -12,7 +12,7 @@ object HttpLogger {
         request.setAttribute(requestStartTimeKey, now)
         val path = getFullQueryPath(request)
 
-        logger.info("{} {}", request.method, path)
+        logger.info("<- {} {}", request.method, path)
     }
 
     fun logResponseOuting(request: HttpServletRequest, response: HttpServletResponse) {
@@ -22,7 +22,7 @@ object HttpLogger {
         if (startTime != null) {
             ms = System.currentTimeMillis() - startTime
         }
-        logger.info("{} {} {} {}ms", request.method, path, response.status, ms)
+        logger.info("-> {} {} {} {}ms", request.method, path, response.status, ms)
     }
 
     private fun getFullQueryPath(request: HttpServletRequest): String {

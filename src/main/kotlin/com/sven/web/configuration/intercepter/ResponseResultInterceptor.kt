@@ -1,6 +1,7 @@
 package com.sven.web.configuration.intercepter
 
 import com.alibaba.fastjson.JSON
+import com.sven.web.common.error.framework.BaseFrameworkError
 import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.configuration.entity.ApiErrorResponse
 import com.sven.web.util.logger.HttpLogger
@@ -20,19 +21,16 @@ import javax.servlet.http.HttpServletResponse
 /**
  * interceptor中的异常无法被GlobalExceptionHandler捕获，因此需要在这里处理，包括请求日志打印
  */
-@Component
 @Aspect
-@Order(1)
+@Order(2)
+@Component
 class ResponseResultInterceptor {
     private val logger = LoggerFactory.getLogger(ResponseResultInterceptor::class.java)
 
     @Around("execution (* com.sven.web.controller.**.*(..))")
     fun responseResult(joinPoint: ProceedingJoinPoint): ApiErrorResponse? {
         val requestAttributes = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
-        val request = requestAttributes.request
         val response = requestAttributes.response!!
-        // 只会打印正常请求的log, 404等错误无法打印
-        HttpLogger.logRequestIncoming(request)
         val responseData = ApiErrorResponse(timestamp = Date())
         try {
             val result = joinPoint.proceed(joinPoint.args)
@@ -52,8 +50,6 @@ class ResponseResultInterceptor {
             responseData.status = "ERROR"
             responseData.message = e.message
             writeResponseError(response, responseData, status)
-        } finally {
-            HttpLogger.logResponseOuting(request, response)
         }
         // return null的时候，就不会再调用后面的interceptor并且不会再response.write了
         return null
