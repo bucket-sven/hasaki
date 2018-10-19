@@ -1,5 +1,6 @@
 package com.sven.web.configuration
 
+import com.sven.web.util.RedisUtil
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,6 +32,16 @@ class RedisConfig {
     @Bean
     fun liveRedis(): StringRedisTemplate {
         return createRedisClient(liveRedisConfig())
+    }
+
+    @Bean
+    fun mainRedisUtil(): RedisUtil {
+        return RedisUtil(mainRedis())
+    }
+
+    @Bean
+    fun liveRedisUtil(): RedisUtil {
+        return RedisUtil(liveRedis())
     }
 
     private fun createRedisClient(redisConfig: BaseRedisConfig): StringRedisTemplate {

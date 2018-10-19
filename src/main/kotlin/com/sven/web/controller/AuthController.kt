@@ -6,9 +6,10 @@ import com.baomidou.mybatisplus.plugins.Page
 import com.sven.web.configuration.multicontenttype.CustomRequestParams
 import com.sven.web.dao.entity.User
 import com.sven.web.dao.mapper.UserMapper
-import com.sven.web.service.Auth
 import com.sven.web.service.AuthService
-import com.sven.web.service.BaseListParams
+import com.sven.web.service.model.AuthParams
+import com.sven.web.service.model.BaseListParams
+import com.sven.web.util.RedisUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -17,13 +18,15 @@ import org.springframework.web.bind.annotation.*
 class AuthController {
     @Autowired
     private lateinit var authService: AuthService
+    @Autowired
+    private lateinit var mainRedisUtil: RedisUtil
 
     @Autowired
     private lateinit var userMapper: UserMapper
 
     @RequestMapping("/auth/sign", method = [ RequestMethod.POST ], consumes = [ MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    fun sign(@CustomRequestParams params: Auth): Any? {
-        val auth = Auth(account = params.account, regType = params.regType)
+    fun sign(@CustomRequestParams params: AuthParams): Any? {
+        val auth = AuthParams(account = params.account, regType = params.regType)
         return authService.auth(auth)
     }
 
@@ -32,11 +35,14 @@ class AuthController {
         val wrapper = EntityWrapper(User())
         val pageObj = Page<User>(params.page, params.count)
         wrapper.orderBy("id DESC")
-        return userMapper.selectPage(pageObj, wrapper)
+        val key = "user:list:${params.page}:${params.count}"
+        return mainRedisUtil.fetchArray(key) {
+            userMapper.selectPage(pageObj, wrapper)
+        }
     }
 
     @RequestMapping("/user")
-    fun customUserList(@CustomRequestParams params: Auth): Any? {
+    fun customUserList(@CustomRequestParams params: AuthParams): Any? {
         println(JSON.toJSONString(params))
         return null
     }

@@ -11,6 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import java.io.IOException
+import java.lang.reflect.Type
 import javax.servlet.http.HttpServletRequest
 
 /**
@@ -48,8 +49,9 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
             constructors.sortBy { it.parameterCount }
             val constructor = constructors[0]
             val args = arrayListOf<Any?>()
-            constructor.parameters.forEach {
-                args.add(null)
+            constructor.parameters.map {
+                val value = getDefaultValue(it.type)
+                args.add(value)
             }
             ret = constructor.newInstance(*args.toArray())
         }
@@ -59,6 +61,20 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
             throw ParamsError("params_error", errors!!)
         }
         return ret
+    }
+
+    private fun getDefaultValue(type: Type): Any? {
+        return when(type) {
+            Int::class.java -> 0
+            Long::class.java -> 0L
+            Float::class.java -> 0F
+            Short::class.java -> 0
+            Byte::class.java -> 0
+            Char::class.java -> '0'
+            Double::class.java -> 0.0
+            Boolean::class.java -> false
+            else -> null
+        }
     }
 
     private fun shouldParseJSON(webRequest: HttpServletRequest): Boolean {

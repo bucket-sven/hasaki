@@ -1,4 +1,4 @@
-create database hasaki;
+create database if not exists hasaki;
 
 use hasaki;
 

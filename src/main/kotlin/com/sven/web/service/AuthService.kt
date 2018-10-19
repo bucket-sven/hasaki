@@ -5,6 +5,7 @@ import com.sven.web.dao.entity.User
 import com.sven.web.dao.entity.UserToken
 import com.sven.web.dao.mapper.UserMapper
 import com.sven.web.dao.mapper.UserTokenMapper
+import com.sven.web.service.model.AuthParams
 import org.hibernate.validator.constraints.Length
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -13,13 +14,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import javax.validation.constraints.NotEmpty
 //import java.util.concurrent.TimeUnit
-
-// 注解不能出现在构造函数的参数上, 否则validator不生效
-class Auth(var regType: String?, account: String?) {
-    @Length(min = 2, max = 10)
-    @NotEmpty
-    var account: String? = account
-}
 
 @Service
 class AuthService {
@@ -32,9 +26,9 @@ class AuthService {
     @Qualifier("mainRedis")
     private lateinit var mainRedis: StringRedisTemplate
 
-    @Autowired
-    @Qualifier("liveRedis")
-    private lateinit var liveRedis: StringRedisTemplate
+//    @Autowired
+//    @Qualifier("liveRedis")
+//    private lateinit var liveRedis: StringRedisTemplate
 
     companion object {
         private const val USER_PREFIX = "user:"
@@ -42,7 +36,7 @@ class AuthService {
     }
 
     @Transactional
-    fun auth(data: Auth): User? {
+    fun auth(data: AuthParams): User? {
         val users = userMapper.selectByMap(hashMapOf<String, Any?>("account" to data.account, "reg_type" to data.regType))
         val user: User
         if (users.size == 0) {
@@ -51,6 +45,7 @@ class AuthService {
         } else {
             user = users[0]
         }
+
         val token = RandomUtil.randomString(32)
         var userToken = userTokenMapper.selectOne(UserToken(userId= user.id))
         if (userToken == null) {
@@ -60,10 +55,13 @@ class AuthService {
             userToken.token = token
             userTokenMapper.updateById(userToken)
         }
+
         mainRedis.execute {
+            val key1 = (USER_PREFIX + user.id).toByteArray()
+            val key2 = (TOKEN_PREFIX + token).toByteArray()
             it.multi()
-            it.setEx((USER_PREFIX + user.id).toByteArray(), 60, token.toByteArray())
-            it.setEx((TOKEN_PREFIX + token).toByteArray(), 60, user.id.toString().toByteArray())
+            it.setEx(key1, 60, token.toByteArray())
+            it.setEx(key2, 60, user.id.toString().toByteArray())
             it.exec()
         }
 //        liveRedis.opsForValue().set("test", "value", 1, TimeUnit.MINUTES)
