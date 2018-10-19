@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
+/**
+ * 统一请求日志输出
+ */
 @Aspect
 @Order(1)
 @Component

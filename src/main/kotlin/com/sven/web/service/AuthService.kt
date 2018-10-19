@@ -6,13 +6,11 @@ import com.sven.web.dao.entity.UserToken
 import com.sven.web.dao.mapper.UserMapper
 import com.sven.web.dao.mapper.UserTokenMapper
 import com.sven.web.service.model.AuthParams
-import org.hibernate.validator.constraints.Length
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import javax.validation.constraints.NotEmpty
 //import java.util.concurrent.TimeUnit
 
 @Service

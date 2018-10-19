@@ -26,8 +26,7 @@ class AuthController {
 
     @RequestMapping("/auth/sign", method = [ RequestMethod.POST ], consumes = [ MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     fun sign(@CustomRequestParams params: AuthParams): Any? {
-        val auth = AuthParams(account = params.account, regType = params.regType)
-        return authService.auth(auth)
+        return authService.auth(params)
     }
 
     @RequestMapping("/user/list")

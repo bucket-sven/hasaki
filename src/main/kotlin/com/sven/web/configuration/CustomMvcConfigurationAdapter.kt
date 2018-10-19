@@ -13,16 +13,25 @@ import java.text.SimpleDateFormat
 
 @Configuration
 class CustomMvcConfigurationAdapter : WebMvcConfigurer {
+    /**
+     * 使用自定义的request请求参数解析器，使之同时能解析application/json，application/x-www-urlencoded-form格式的数据
+     */
     override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
         argumentResolvers.add(CustomRequestParamsArgumentResolver())
     }
 
+    /**
+     * 仅对开发、测试环境生效
+     */
     @Bean
     @Profile("dev", "test")
     fun performanceInterceptor(): PerformanceInterceptor {
         return PerformanceInterceptor()
     }
 
+    /**
+     * api返回的JSON数据中，使用的日期格式
+     */
     @Bean
     fun getObjectMapper(): ObjectMapper {
         val obj = ObjectMapper()

@@ -1,10 +1,8 @@
 package com.sven.web.configuration.intercepter
 
 import com.alibaba.fastjson.JSON
-import com.sven.web.common.error.framework.BaseFrameworkError
 import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.configuration.entity.ApiErrorResponse
-import com.sven.web.util.logger.HttpLogger
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -19,7 +17,7 @@ import java.util.*
 import javax.servlet.http.HttpServletResponse
 
 /**
- * interceptor中的异常无法被GlobalExceptionHandler捕获，因此需要在这里处理，包括请求日志打印
+ * interceptor中的异常无法被GlobalExceptionHandler捕获，因此需要在这里处理
  */
 @Aspect
 @Order(2)

@@ -12,5 +12,4 @@ class HasakiApplicationTests {
 	@Test
 	fun contextLoads() {
 	}
-
 }

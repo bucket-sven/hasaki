@@ -10,8 +10,8 @@ class ValidationUtil {
 
     companion object {
 //        val validator = Validation.byProvider(HibernateValidator::class.java).configure().failFast(true).buildValidatorFactory().validator
-        val validator = Validation.buildDefaultValidatorFactory().validator
         inline fun <reified T>validateEntity(obj: T): ValidationResult {
+            val validator = Validation.buildDefaultValidatorFactory().validator
             val result = ValidationResult()
             val set = validator.validate(obj)
             if (set != null && set.size != 0) {

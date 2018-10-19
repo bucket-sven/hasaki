@@ -4,6 +4,9 @@ import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * HTTP请求日志输出格式
+ */
 object HttpLogger {
     private val logger = LoggerFactory.getLogger(HttpLogger::class.java)
     private const val requestStartTimeKey = "REQUEST_LOG_START_TIME"
@@ -25,6 +28,11 @@ object HttpLogger {
         logger.info("-> {} {} {} {}ms", request.method, path, response.status, ms)
     }
 
+    /**
+     * 获取请求uri路径， /path?query
+     * @param request
+     * @return uri
+     */
     private fun getFullQueryPath(request: HttpServletRequest): String {
         var path = request.servletPath
         if (!request.queryString.isNullOrEmpty()) {
