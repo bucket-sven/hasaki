@@ -7,6 +7,7 @@ import com.sven.web.service.AuthService
 import com.sven.web.service.model.AuthParams
 import com.sven.web.service.model.BaseListParams
 import com.sven.web.util.RedisUtil
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class AuthController {
+    private val logger = LoggerFactory.getLogger(AuthController::class.java)
+
     @Autowired
     private lateinit var authService: AuthService
     @Autowired
@@ -38,7 +41,7 @@ class AuthController {
 
     @RequestMapping("/user")
     fun customUserList(@CustomRequestParams params: AuthParams): Any? {
-        println(JSON.toJSONString(params))
+        logger.info(JSON.toJSONString(params))
         return params
     }
 }
