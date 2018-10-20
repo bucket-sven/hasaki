@@ -81,7 +81,7 @@ class RedisUtil(var redisTemplate: RedisTemplate<String, String>) : RedisOperati
      * @param expireSeconds 超时时间
      * @param func 回调函数
      */
-    inline fun <reified T>fetchArray(key: String, expireSeconds: Long = 300, func: () -> Iterable<T>): Iterable<T> {
+    inline fun <reified T>fetchArray(key: String, expireSeconds: Long = 300, func: () -> Collection<T>): Collection<T> {
         val ops = redisTemplate.opsForValue()
         val str = ops.get(key)
         if (str == null) {

@@ -1,10 +1,10 @@
 package com.sven.web.service
 
 import cn.hutool.core.util.RandomUtil
+import com.sven.web.dao.repository.UserRepository
+import com.sven.web.dao.repository.UserTokenRepository
 import com.sven.web.dao.entity.User
 import com.sven.web.dao.entity.UserToken
-import com.sven.web.dao.mapper.UserMapper
-import com.sven.web.dao.mapper.UserTokenMapper
 import com.sven.web.service.model.AuthParams
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AuthService {
     @Autowired
-    private lateinit var userMapper: UserMapper
+    private lateinit var userRepository: UserRepository
+
     @Autowired
-    private lateinit var userTokenMapper: UserTokenMapper
+    private lateinit var userTokenRepository: UserTokenRepository
 
     @Autowired
     @Qualifier("mainRedis")
@@ -35,23 +36,24 @@ class AuthService {
 
     @Transactional
     fun auth(data: AuthParams): User? {
-        val users = userMapper.selectByMap(hashMapOf<String, Any?>("account" to data.account, "reg_type" to data.regType))
-        val user: User
-        if (users.size == 0) {
-            user = User(account = data.account, regType = data.regType)
-            userMapper.insert(user)
-        } else {
-            user = users[0]
+        var user = userRepository.findByAccountAndRegType(data.account, data.regType)
+        if (user == null) {
+            val t = User()
+            t.account = data.account
+            t.regType = data.regType
+            user = userRepository.save(t)
         }
 
         val token = RandomUtil.randomString(32)
-        var userToken = userTokenMapper.selectOne(UserToken(userId= user.id))
+        var userToken = userTokenRepository.findByUserId(user.id)
         if (userToken == null) {
-            userToken = UserToken(token = token, userId = user.id)
-            userTokenMapper.insert(userToken)
+            userToken = UserToken()
+            userToken.token = token
+            userToken.userId = user.id
+            userTokenRepository.save(userToken)
         } else {
             userToken.token = token
-            userTokenMapper.updateById(userToken)
+            userTokenRepository.save(userToken)
         }
 
         mainRedis.execute {

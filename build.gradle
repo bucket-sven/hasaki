@@ -47,18 +47,17 @@ configurations {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-aop')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-undertow')
 	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
 	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
 	compile group: 'com.alibaba', name: 'fastjson', version: '1.2.49'
-	compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '2.3'
 	compile group: 'cn.hutool', name: 'hutool-core', version: '4.1.7'
-//	compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-//	compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.0.12.Final'
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 	runtime('mysql:mysql-connector-java')
+	compile('javax.xml.bind:jaxb-api:2.2.11')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
