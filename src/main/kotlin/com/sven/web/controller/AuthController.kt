@@ -20,6 +20,7 @@ class AuthController {
 
     @Autowired
     private lateinit var authService: AuthService
+
     @Autowired
     private lateinit var mainRedisUtil: RedisUtil
 

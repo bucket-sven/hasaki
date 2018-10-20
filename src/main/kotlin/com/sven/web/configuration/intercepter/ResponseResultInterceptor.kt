@@ -39,22 +39,30 @@ class ResponseResultInterceptor {
             responseData.data = result
             return responseData
         } catch (e: Exception) {
-            var status = HttpStatus.INTERNAL_SERVER_ERROR.value()
-            if (e is BaseServiceError) {
-                logger.warn("{}: {}", e.javaClass.name, e.message)
-                status = e.statusCode
-                responseData.error = e.code
-            } else {
-                responseData.error = HttpStatus.INTERNAL_SERVER_ERROR.name
-                logger.error("", e)
-            }
-            responseData.status = "ERROR"
-            responseData.message = e.message
-            writeResponseError(response, responseData, status)
+            processException(e, response, responseData)
         }
 
         // return null的时候，就不会再调用后面的interceptor并且不会再response.write了
         return null
+    }
+
+    /**
+     * 业务级异常处理
+     */
+    private fun processException(e: Exception, response: HttpServletResponse, responseData: ApiResponse) {
+        var status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+        responseData.status = "ERROR"
+        responseData.message = e.message
+
+        if (e is BaseServiceError) {
+            logger.warn("{}: {}", e.javaClass.name, e.message)
+            status = e.statusCode
+            responseData.error = e.code
+        } else {
+            responseData.error = HttpStatus.INTERNAL_SERVER_ERROR.name
+            logger.error("", e)
+        }
+        writeResponseError(response, responseData, status)
     }
 
     /**

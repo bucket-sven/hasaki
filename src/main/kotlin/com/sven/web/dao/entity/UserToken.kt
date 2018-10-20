@@ -4,7 +4,7 @@ import javax.persistence.Column
 import javax.persistence.Entity
 
 @Entity
-class UserToken : BaseEntity() {
+class UserToken : UpdatableEntity() {
     @Column
     var token: String? = null
 

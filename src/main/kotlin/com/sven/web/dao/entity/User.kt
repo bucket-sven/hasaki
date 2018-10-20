@@ -4,7 +4,7 @@ import javax.persistence.Column
 import javax.persistence.Entity
 
 @Entity
-class User : BaseEntity() {
+class User : UpdatableEntity() {
     @Column
     var account: String? = null
 

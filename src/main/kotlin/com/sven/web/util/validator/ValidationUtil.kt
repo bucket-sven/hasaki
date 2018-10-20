@@ -2,6 +2,9 @@ package com.sven.web.util.validator
 
 import javax.validation.Validation
 
+/**
+ * 模型验证
+ */
 class ValidationUtil {
     class ValidationResult {
         var hasErrors: Boolean = false

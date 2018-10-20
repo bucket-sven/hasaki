@@ -1,6 +1,7 @@
 package com.sven.web.controller.advice
 
 import com.sven.web.common.error.framework.BaseFrameworkError
+import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.service.model.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
- * 此Handler无法捕获aop中的异常，目前用于捕获其他异常，比如Resolver中的异常
+ * 用于捕获非业务性异常，比如Resolver中的异常
  */
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -67,6 +68,16 @@ class GlobalExceptionHandler {
         val messages = e.fieldErrors.map { "${it.field} ${it.defaultMessage}" }
         val responseData = ApiResponse(timestamp = Date(), error = "params_error", message = messages.joinToString(","))
         responseData.status = "ERROR"
+        return responseData
+    }
+
+    @ExceptionHandler(value = [ BaseServiceError::class ])
+    fun serviceError(e: BaseServiceError, res: HttpServletResponse): ApiResponse {
+        val responseData = ApiResponse(timestamp = Date(), error = e.code, message = e.message)
+        res.status = e.statusCode
+        logger.error("{}", e)
+        responseData.status = "ERROR"
+        responseData.message = e.message
         return responseData
     }
 }
