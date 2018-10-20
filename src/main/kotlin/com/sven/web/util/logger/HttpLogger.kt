@@ -18,14 +18,18 @@ object HttpLogger {
         logger.info("<- {} {}", request.method, path)
     }
 
-    fun logResponseOuting(request: HttpServletRequest, response: HttpServletResponse) {
+    fun logResponseOuting(request: HttpServletRequest, response: HttpServletResponse, status: Int? = null) {
         val path = getFullQueryPath(request)
+        var statusCode = status
         val startTime = request.getAttribute(requestStartTimeKey) as Long?
         var ms: Long? = null
         if (startTime != null) {
             ms = System.currentTimeMillis() - startTime
         }
-        logger.info("-> {} {} {} {}ms", request.method, path, response.status, ms)
+        if (statusCode == null) {
+            statusCode = response.status
+        }
+        logger.info("-> {} {} {} {}ms", request.method, path, statusCode, ms)
     }
 
     /**

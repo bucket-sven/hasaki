@@ -52,6 +52,7 @@ class ResponseResultInterceptor {
             responseData.message = e.message
             writeResponseError(response, responseData, status)
         }
+
         // return null的时候，就不会再调用后面的interceptor并且不会再response.write了
         return null
     }

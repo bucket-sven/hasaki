@@ -1,6 +1,7 @@
 package com.sven.web.controller
 
 import com.alibaba.fastjson.JSON
+import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.configuration.multicontenttype.CustomRequestParams
 import com.sven.web.dao.repository.UserRepository
 import com.sven.web.service.AuthService
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 class AuthController {
@@ -43,5 +45,10 @@ class AuthController {
     fun customUserList(@CustomRequestParams params: AuthParams): Any? {
         logger.info(JSON.toJSONString(params))
         return params
+    }
+
+    @RequestMapping("/")
+    fun index(@Valid params: AuthParams): Any {
+        return ""
     }
 }

@@ -1,12 +1,12 @@
-package com.sven.web.configuration.advice
+package com.sven.web.controller.advice
 
 import com.sven.web.common.error.framework.BaseFrameworkError
 import com.sven.web.service.model.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.validation.BindException
 import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
@@ -22,7 +22,7 @@ class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(value = [ BaseFrameworkError::class ])
-    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun defaultErrorHandler(req: HttpServletRequest, res: HttpServletResponse, e: BaseFrameworkError): ApiResponse {
         val responseData = ApiResponse(timestamp = Date(), message = e.message)
         logger.warn("{}: {}", e.javaClass.name, e.message)
@@ -33,7 +33,6 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = [ NoHandlerFoundException::class ])
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun notFound(): ApiResponse {
         val status = HttpStatus.NOT_FOUND
@@ -43,7 +42,6 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = [ Exception::class ])
-    @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun internalServerError(e: Exception): ApiResponse {
         logger.error("", e)
@@ -54,12 +52,20 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = [ HttpMediaTypeNotSupportedException::class ])
-    @ResponseBody
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     fun unsupportedMediaType(e: Exception): ApiResponse {
         logger.warn(e.message)
         val status = HttpStatus.UNSUPPORTED_MEDIA_TYPE
         val responseData = ApiResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
+        responseData.status = "ERROR"
+        return responseData
+    }
+
+    @ExceptionHandler(value = [ BindException::class ])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun invalidParams(e: BindException): ApiResponse {
+        val messages = e.fieldErrors.map { "${it.field} ${it.defaultMessage}" }
+        val responseData = ApiResponse(timestamp = Date(), error = "params_error", message = messages.joinToString(","))
         responseData.status = "ERROR"
         return responseData
     }
