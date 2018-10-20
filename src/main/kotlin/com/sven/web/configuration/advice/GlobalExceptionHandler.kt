@@ -1,7 +1,7 @@
 package com.sven.web.configuration.advice
 
 import com.sven.web.common.error.framework.BaseFrameworkError
-import com.sven.web.configuration.entity.ApiResponse
+import com.sven.web.service.model.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.HttpMediaTypeNotSupportedException
@@ -37,7 +37,7 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun notFound(): ApiResponse {
         val status = HttpStatus.NOT_FOUND
-        val responseData = ApiResponse(timestamp = Date(), error= status.name, message = status.reasonPhrase)
+        val responseData = ApiResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData
     }

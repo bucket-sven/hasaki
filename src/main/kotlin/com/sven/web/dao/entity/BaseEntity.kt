@@ -1,7 +1,10 @@
 package com.sven.web.dao.entity
 
-import org.hibernate.annotations.UpdateTimestamp
+import com.alibaba.fastjson.annotation.JSONField
+import com.sven.web.util.Constants
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import java.util.*
 import javax.persistence.*
 
 @MappedSuperclass
@@ -12,9 +15,11 @@ open class BaseEntity {
 
     @Column
     @CreatedDate
-    var createTime: String? = null
+    @JSONField(format = Constants.DATE_FORMAT)
+    var createTime: Date? = null
 
     @Column
-    @UpdateTimestamp
-    var updateTime: String? = null
+    @LastModifiedDate
+    @JSONField(format = Constants.DATE_FORMAT)
+    var updateTime: Date? = null
 }
