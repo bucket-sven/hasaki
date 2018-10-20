@@ -2,7 +2,7 @@ package com.sven.web.configuration.intercepter
 
 import com.alibaba.fastjson.JSON
 import com.sven.web.common.error.service.BaseServiceError
-import com.sven.web.configuration.entity.ApiErrorResponse
+import com.sven.web.configuration.entity.ApiResponse
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -26,13 +26,16 @@ class ResponseResultInterceptor {
     private val logger = LoggerFactory.getLogger(ResponseResultInterceptor::class.java)
 
     @Around("execution (* com.sven.web.controller.**.*(..))")
-    fun responseResult(joinPoint: ProceedingJoinPoint): ApiErrorResponse? {
+    fun responseResult(joinPoint: ProceedingJoinPoint): ApiResponse? {
         val requestAttributes = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
         val response = requestAttributes.response!!
-        val responseData = ApiErrorResponse(timestamp = Date())
+        val responseData = ApiResponse(timestamp = Date())
         try {
-            val result = joinPoint.proceed(joinPoint.args)
+            var result = joinPoint.proceed(joinPoint.args)
             responseData.status = "OK"
+            if (result == null) {
+                result = mapOf<String, Any>()
+            }
             responseData.data = result
             return responseData
         } catch (e: Exception) {

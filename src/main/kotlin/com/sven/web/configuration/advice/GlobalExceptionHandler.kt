@@ -1,7 +1,7 @@
 package com.sven.web.configuration.advice
 
 import com.sven.web.common.error.framework.BaseFrameworkError
-import com.sven.web.configuration.entity.ApiErrorResponse
+import com.sven.web.configuration.entity.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.HttpMediaTypeNotSupportedException
@@ -23,8 +23,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(value = [ BaseFrameworkError::class ])
     @ResponseBody
-    fun defaultErrorHandler(req: HttpServletRequest, res: HttpServletResponse, e: BaseFrameworkError): ApiErrorResponse {
-        val responseData = ApiErrorResponse(timestamp = Date(), message = e.message)
+    fun defaultErrorHandler(req: HttpServletRequest, res: HttpServletResponse, e: BaseFrameworkError): ApiResponse {
+        val responseData = ApiResponse(timestamp = Date(), message = e.message)
         logger.warn("{}: {}", e.javaClass.name, e.message)
         responseData.error = e.code
         res.status = e.statusCode
@@ -35,9 +35,9 @@ class GlobalExceptionHandler {
     @ExceptionHandler(value = [ NoHandlerFoundException::class ])
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun notFound(): ApiErrorResponse {
+    fun notFound(): ApiResponse {
         val status = HttpStatus.NOT_FOUND
-        val responseData = ApiErrorResponse(timestamp = Date(), error= status.name, message = status.reasonPhrase)
+        val responseData = ApiResponse(timestamp = Date(), error= status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData
     }
@@ -45,10 +45,10 @@ class GlobalExceptionHandler {
     @ExceptionHandler(value = [ Exception::class ])
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun internalServerError(e: Exception): ApiErrorResponse {
+    fun internalServerError(e: Exception): ApiResponse {
         logger.error("", e)
         val status = HttpStatus.INTERNAL_SERVER_ERROR
-        val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
+        val responseData = ApiResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData
     }
@@ -56,10 +56,10 @@ class GlobalExceptionHandler {
     @ExceptionHandler(value = [ HttpMediaTypeNotSupportedException::class ])
     @ResponseBody
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    fun unsupportedMediaType(e: Exception): ApiErrorResponse {
+    fun unsupportedMediaType(e: Exception): ApiResponse {
         logger.warn(e.message)
         val status = HttpStatus.UNSUPPORTED_MEDIA_TYPE
-        val responseData = ApiErrorResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
+        val responseData = ApiResponse(timestamp = Date(), error = status.name, message = status.reasonPhrase)
         responseData.status = "ERROR"
         return responseData
     }

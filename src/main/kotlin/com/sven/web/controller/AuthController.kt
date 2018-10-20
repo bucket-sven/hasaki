@@ -39,6 +39,6 @@ class AuthController {
     @RequestMapping("/user")
     fun customUserList(@CustomRequestParams params: AuthParams): Any? {
         println(JSON.toJSONString(params))
-        return null
+        return params
     }
 }
