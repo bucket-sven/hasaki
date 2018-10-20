@@ -1,12 +1,10 @@
 package com.sven.web.configuration
 
-import com.baomidou.mybatisplus.plugins.PerformanceInterceptor
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sven.web.configuration.multicontenttype.CustomRequestParamsArgumentResolver
 import com.sven.web.util.Constants
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.text.SimpleDateFormat
@@ -18,15 +16,6 @@ class CustomMvcConfigurationAdapter : WebMvcConfigurer {
      */
     override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
         argumentResolvers.add(CustomRequestParamsArgumentResolver())
-    }
-
-    /**
-     * 仅对开发、测试环境生效
-     */
-    @Bean
-    @Profile("dev", "test")
-    fun performanceInterceptor(): PerformanceInterceptor {
-        return PerformanceInterceptor()
     }
 
     /**
