@@ -28,12 +28,12 @@ class AuthController {
     private lateinit var userRepository: UserRepository
 
     @PostMapping("/auth/sign", consumes = [ MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
-    fun sign(@CustomRequestParams params: AuthParams): Any? {
+    fun sign(params: AuthParams): Any? {
         return authService.auth(params)
     }
 
     @GetMapping("/user/list")
-    fun users(@CustomRequestParams params: BaseListParams): Any? {
+    fun users(params: BaseListParams): Any? {
         val key = "user_list:${params.page}:${params.count}"
         return mainRedisUtil.fetchArray(key, expireSeconds = 30) {
             val info = userRepository.findAll(PageRequest.of(params.page, params.count))
@@ -41,9 +41,6 @@ class AuthController {
         }
     }
 
-    /**
-     * CustomRequestParams 虽然可以同时读取query、form、json上传的参数，但目前性能较低
-     */
     @GetMapping("/user")
     fun customUserList(@CustomRequestParams params: AuthParams): Any? {
         logger.info(JSON.toJSONString(params))
