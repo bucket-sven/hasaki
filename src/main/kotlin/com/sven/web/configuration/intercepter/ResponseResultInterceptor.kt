@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.core.annotation.Order
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -24,6 +25,9 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class ResponseResultInterceptor {
     private val logger = LoggerFactory.getLogger(ResponseResultInterceptor::class.java)
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Around("execution (* com.sven.web.controller.**.*(..))")
     fun responseResult(joinPoint: ProceedingJoinPoint): ApiResponse? {
@@ -72,7 +76,7 @@ class ResponseResultInterceptor {
         val writer = response.writer
         response.status = status
         response.setHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
-        writer.write(ObjectMapper().writeValueAsString(data))
+        writer.write(objectMapper.writeValueAsString(data))
         writer.flush()
         writer.close()
     }
