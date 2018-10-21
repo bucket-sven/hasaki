@@ -1,6 +1,6 @@
 package com.sven.web.configuration.intercepter
 
-import com.alibaba.fastjson.JSON
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.service.model.ApiResponse
 import org.aspectj.lang.ProceedingJoinPoint
@@ -72,7 +72,7 @@ class ResponseResultInterceptor {
         val writer = response.writer
         response.status = status
         response.setHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
-        writer.write(JSON.toJSONString(data))
+        writer.write(ObjectMapper().writeValueAsString(data))
         writer.flush()
         writer.close()
     }
