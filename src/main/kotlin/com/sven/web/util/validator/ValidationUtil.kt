@@ -1,6 +1,7 @@
 package com.sven.web.util.validator
 
 import javax.validation.Validation
+import javax.validation.Validator
 
 /**
  * 模型验证
@@ -12,7 +13,7 @@ object ValidationUtil {
     }
 
 //    val validator = Validation.byProvider(HibernateValidator::class.java).configure().failFast(true).buildValidatorFactory().validator
-    val validator = Validation.buildDefaultValidatorFactory().validator
+    val validator: Validator = Validation.buildDefaultValidatorFactory().validator
 
     inline fun <reified T>validateEntity(obj: T): ValidationResult {
         val result = ValidationResult()
