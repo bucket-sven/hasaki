@@ -2,7 +2,7 @@ package com.sven.web.configuration.multicontenttype
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONObject
-import com.sven.web.common.error.framework.ParamsError
+import com.sven.web.common.error.framework.RequestParamsError
 import com.sven.web.util.validator.ValidationUtil
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
@@ -58,7 +58,7 @@ class CustomRequestParamsArgumentResolver : HandlerMethodArgumentResolver {
         val valid = ValidationUtil.validateEntity(ret)
         if (valid.hasErrors) {
             val errors = valid.errorMsg?.map { it.key + it.value }?.joinToString(",")
-            throw ParamsError("params_error", errors!!)
+            throw RequestParamsError("params_error", errors!!)
         }
         return ret
     }
