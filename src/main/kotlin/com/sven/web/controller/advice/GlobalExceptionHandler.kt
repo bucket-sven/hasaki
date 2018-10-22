@@ -1,7 +1,6 @@
 package com.sven.web.controller.advice
 
 import com.sven.web.common.error.framework.BaseFrameworkError
-import com.sven.web.common.error.service.BaseServiceError
 import com.sven.web.service.model.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -71,13 +70,13 @@ class GlobalExceptionHandler {
         return responseData
     }
 
-    @ExceptionHandler(value = [ BaseServiceError::class ])
-    fun serviceError(e: BaseServiceError, res: HttpServletResponse): ApiResponse {
-        val responseData = ApiResponse(timestamp = Date(), error = e.code, message = e.message)
-        res.status = e.statusCode
-        logger.error("{}", e)
-        responseData.status = "ERROR"
-        responseData.message = e.message
-        return responseData
-    }
+//    @ExceptionHandler(value = [ BaseServiceError::class ])
+//    fun serviceError(e: BaseServiceError, res: HttpServletResponse): ApiResponse {
+//        val responseData = ApiResponse(timestamp = Date(), error = e.code, message = e.message)
+//        res.status = e.statusCode
+//        logger.error("{}", e)
+//        responseData.status = "ERROR"
+//        responseData.message = e.message
+//        return responseData
+//    }
 }

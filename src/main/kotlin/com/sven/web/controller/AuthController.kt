@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 class AuthController {
@@ -48,7 +47,7 @@ class AuthController {
     }
 
     @GetMapping("/")
-    fun index(@Valid params: AuthParams): Any {
+    fun index(params: AuthParams): Any {
         return ""
     }
 }
